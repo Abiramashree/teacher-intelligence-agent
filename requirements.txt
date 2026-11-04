@@ -1,5 +1,6 @@
 streamlit>=1.32
 langchain>=0.2
+langchain-classic>=1.0   # provides the classic AgentExecutor API under LangChain 1.x
 langchain-community>=0.2
 langchain-core>=0.2
 langchain-text-splitters>=0.2

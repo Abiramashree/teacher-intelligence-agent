@@ -98,23 +98,25 @@ docker compose exec ollama ollama pull llama3.1:8b   # one time
 
 ### Hosted demo (free, always-available)
 
-Deploy on **Streamlit Community Cloud** with the LLM running on **Hugging Face's
-serverless Inference Providers** (open-source models). Free, public URL, no backend to
-manage. Full steps: [`deploy/streamlit-cloud/`](deploy/streamlit-cloud/).
+Deploy on **Streamlit Community Cloud** with the LLM running on **Groq's free API**
+(open-source Llama models). Free, public URL, no backend to manage. Full steps:
+[`deploy/streamlit-cloud/`](deploy/streamlit-cloud/).
 
-Short version: push this repo to GitHub, go to <https://share.streamlit.io>, deploy
-`app.py` from the repo, and add these **Secrets**:
+Short version: push this repo to GitHub, get a free key at
+<https://console.groq.com/keys>, go to <https://share.streamlit.io>, deploy `app.py`
+from the repo, and add these **Secrets**:
 
 ```toml
 LLM_PROVIDER = "openai"
-OPENAI_BASE_URL = "https://router.huggingface.co/v1"
-OPENAI_API_KEY = "hf_your_token_here"
-SUMMARY_MODEL = "Qwen/Qwen2.5-7B-Instruct"
-AGENT_MODEL = "Qwen/Qwen2.5-7B-Instruct"
+OPENAI_BASE_URL = "https://api.groq.com/openai/v1"
+OPENAI_API_KEY = "gsk_your_groq_key_here"
+SUMMARY_MODEL = "llama-3.1-8b-instant"
+AGENT_MODEL = "llama-3.3-70b-versatile"
 ```
 
-> Free HF serverless inference has a small monthly credit (enough for a light demo), and
-> the app sleeps when idle and wakes on the next visit.
+> The backend is OpenAI-compatible, so you can point `OPENAI_BASE_URL` at any provider
+> (Groq, a LiteLLM gateway, vLLM, the HF router, …) without code changes. The app sleeps
+> when idle and wakes on the next visit.
 
 **Self-hosted alternative (Hugging Face Space, requires HF PRO).** A single-container
 Docker Space that runs Ollama + the model itself — no per-call limits, fully self-hosted —

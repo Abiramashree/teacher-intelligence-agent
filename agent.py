@@ -17,7 +17,11 @@ try:
 except ImportError:  # pragma: no cover - older LangChain fallback
     from langchain.tools import tool
 
-from langchain.agents import AgentExecutor, create_tool_calling_agent
+try:
+    # LangChain >= 1.0 moved the classic agent API to the langchain-classic package.
+    from langchain_classic.agents import AgentExecutor, create_tool_calling_agent
+except ImportError:  # pragma: no cover - LangChain < 1.0
+    from langchain.agents import AgentExecutor, create_tool_calling_agent
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 

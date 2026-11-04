@@ -1,20 +1,21 @@
-# Hosted demo — Streamlit Community Cloud + Hugging Face serverless
+# Hosted demo — Streamlit Community Cloud + Groq (free, open-source models)
 
 Free, always-available, public URL. The app runs on Streamlit Community Cloud; the
-open-source LLM runs on Hugging Face's serverless Inference Providers (called through
-their OpenAI-compatible router). Embeddings run locally inside the app.
+open-source LLM (Llama 3.x) runs on **Groq's free API** via its OpenAI-compatible
+endpoint. Embeddings run locally inside the app.
 
-> Why not a Hugging Face Space? Free HF Spaces now only allow *Static* Spaces — Docker/
-> Gradio/Streamlit Spaces that run a backend require a PRO subscription. The Docker Space
-> in [`../hf-space/`](../hf-space/) still works if you have HF PRO.
+> Why Groq and not Hugging Face? HF's free serverless inference credit is tiny and runs
+> out fast (HTTP 402). Groq's free tier has no such micro-credit wall and serves
+> open-source Llama models with fast tool-calling. The code is backend-agnostic
+> (`LLM_PROVIDER=openai` + a base URL), so you can point it at any OpenAI-compatible
+> provider — HF router, a LiteLLM gateway, vLLM, etc. — by changing the secrets.
 
 ## One-time setup
 
 1. Make sure this repo is pushed to GitHub (it is):
    <https://github.com/Abiramashree/teacher-intelligence-agent>
 
-2. Get a Hugging Face token (read access is enough) from
-   <https://huggingface.co/settings/tokens>.
+2. Get a free Groq API key at <https://console.groq.com/keys> (starts with `gsk_`).
 
 3. Go to <https://share.streamlit.io> → sign in with GitHub → **Create app** →
    **Deploy a public app from GitHub**:
@@ -22,20 +23,16 @@ their OpenAI-compatible router). Embeddings run locally inside the app.
    - Branch: `main`
    - Main file path: `app.py`
 
-4. Before (or right after) deploying, open **Advanced settings → Secrets** (or
-   **Settings → Secrets** on an existing app) and paste:
+4. Open **Advanced settings → Secrets** (or **Settings → Secrets** on an existing app)
+   and paste:
 
    ```toml
    LLM_PROVIDER = "openai"
-   OPENAI_BASE_URL = "https://router.huggingface.co/v1"
-   OPENAI_API_KEY = "hf_your_token_here"
-   SUMMARY_MODEL = "Qwen/Qwen2.5-7B-Instruct"
-   AGENT_MODEL = "Qwen/Qwen2.5-7B-Instruct"
+   OPENAI_BASE_URL = "https://api.groq.com/openai/v1"
+   OPENAI_API_KEY = "gsk_your_groq_key_here"
+   SUMMARY_MODEL = "llama-3.1-8b-instant"
+   AGENT_MODEL = "llama-3.3-70b-versatile"
    ```
-
-   (`Qwen/Qwen2.5-7B-Instruct` is open and ungated — no license step. You can swap in
-   another instruct model the router supports, e.g. `meta-llama/Llama-3.1-8B-Instruct`
-   after accepting its terms on the HF model page.)
 
 5. Deploy. First build takes a few minutes (installing deps, downloading the local
    embedding model, building the FAISS index). After that the app is live at a public
@@ -43,12 +40,11 @@ their OpenAI-compatible router). Embeddings run locally inside the app.
 
 ## Notes
 
-- **Free inference credits are limited.** Hugging Face gives free accounts a small
-  monthly credit for serverless inference — fine for a light demo. Heavy use needs HF
-  PRO or pay-as-you-go. The "Quick RAG summary" button is the cheapest path.
-- **Tool calling (the full agent + PDF button)** depends on the chosen model/provider
-  supporting OpenAI-style tools. If it errors, the RAG summary still works; you can also
-  switch `AGENT_MODEL` to another instruct model the router supports.
-- Streamlit Community Cloud apps sleep after a period of inactivity and wake on the next
-  visit (a short cold start) — the same always-available-but-sleeps behaviour as free HF.
-- Keep your token in Streamlit **Secrets**, never in the repo.
+- **Groq free tier** has generous rate limits (requests/min, tokens/day) — fine for a
+  demo. The "Quick RAG summary" button uses the small 8B model; the full agent + PDF
+  button uses the 70B model for reliable tool calling.
+- Streamlit Community Cloud apps sleep after inactivity and wake on the next visit (a
+  short cold start).
+- Keep your key in Streamlit **Secrets**, never in the repo.
+- To use a different OpenAI-compatible provider instead, just change `OPENAI_BASE_URL`,
+  `OPENAI_API_KEY`, and the model names in the secrets — no code change.
