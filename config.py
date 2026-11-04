@@ -41,3 +41,8 @@ AGENT_MODEL = os.getenv("AGENT_MODEL", "llama3.1:8b")
 # Only used when LLM_PROVIDER=openai (OpenAI-compatible servers).
 OPENAI_BASE_URL = os.getenv("OPENAI_BASE_URL", "http://localhost:4000/v1")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "not-needed")
+
+# Only used when LLM_PROVIDER=gemini (native Google Gemini via langchain-google-genai).
+# Gemini 3.x "thinking" models return a thought signature that must be replayed through
+# the agent's tool loop; the native client handles this, the OpenAI-compat shim does not.
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", os.getenv("GEMINI_API_KEY", ""))

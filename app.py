@@ -28,6 +28,13 @@ st.set_page_config(page_title="Teacher Intelligence Agent", page_icon="🧑‍�
 
 def backend_ready() -> tuple[bool, str]:
     """Best-effort check that the configured LLM backend is reachable."""
+    if config.LLM_PROVIDER == "gemini":
+        key_set = bool(config.GOOGLE_API_KEY)
+        return key_set, (
+            "Using native Google Gemini"
+            if key_set
+            else "LLM_PROVIDER=gemini but no GOOGLE_API_KEY is set."
+        )
     if config.LLM_PROVIDER != "ollama":
         key_set = bool(config.OPENAI_API_KEY and config.OPENAI_API_KEY != "not-needed")
         return key_set, (

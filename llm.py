@@ -32,6 +32,18 @@ def make_llm(model: Optional[str] = None, temperature: float = 0.0):
             temperature=temperature,
         )
 
+    if config.LLM_PROVIDER == "gemini":
+        # Native Google Gemini. Unlike the OpenAI-compat shim, this preserves the
+        # thought signature that Gemini 3.x thinking models require across tool calls,
+        # so the agent / PDF path works.
+        from langchain_google_genai import ChatGoogleGenerativeAI
+
+        return ChatGoogleGenerativeAI(
+            model=model,
+            google_api_key=config.GOOGLE_API_KEY,
+            temperature=temperature,
+        )
+
     if config.LLM_PROVIDER == "openai":
         # Any OpenAI-compatible server (LiteLLM gateway, vLLM, Groq, ...).
         from langchain_openai import ChatOpenAI
@@ -44,5 +56,5 @@ def make_llm(model: Optional[str] = None, temperature: float = 0.0):
         )
 
     raise ValueError(
-        f"Unknown LLM_PROVIDER={config.LLM_PROVIDER!r}. Use 'ollama' or 'openai'."
+        f"Unknown LLM_PROVIDER={config.LLM_PROVIDER!r}. Use 'ollama', 'openai', or 'gemini'."
     )

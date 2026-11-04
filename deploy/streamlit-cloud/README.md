@@ -39,6 +39,24 @@ Embeddings run locally inside the app.
    embedding model, building the FAISS index). After that the app is live at a public
    `*.streamlit.app` URL.
 
+## Alternative backend: native Google Gemini (proprietary)
+
+Gemini's free tier is reliable and its tool-calling (the PDF/agent button) works well,
+but it is **not an open-source model**. Use it instead of the OpenRouter block above:
+
+```toml
+LLM_PROVIDER = "gemini"
+GOOGLE_API_KEY = "AIza_your_key"
+SUMMARY_MODEL = "gemini-2.5-flash"
+AGENT_MODEL = "gemini-2.5-flash"
+```
+
+Get a key at <https://aistudio.google.com/apikey>. This uses the native `langchain-
+google-genai` client, not the OpenAI-compat endpoint — important because Gemini 3.x
+"thinking" models return a thought signature that must be replayed through the agent's
+tool loop. The OpenAI-compat shim drops it and the PDF step 400s; the native client
+handles it.
+
 ## Notes
 
 - **OpenRouter free tier** is roughly ~50 requests/day until you add a one-time $10
