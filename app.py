@@ -101,8 +101,10 @@ elif run_agent:
         executor = build_agent_executor()
         full_query = query + " Also save the insights as a PDF named 'tutoring_insights.pdf'."
         result = executor.invoke({"input": full_query})
+        from rag_engine import content_to_text
+
         st.markdown("### Agent Output")
-        st.write(result["output"])
+        st.markdown(content_to_text(result.get("output", "")))
 
         pdf_path = "tutoring_insights.pdf"
         if os.path.exists(pdf_path):

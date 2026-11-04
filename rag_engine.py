@@ -158,6 +158,25 @@ class FaissVectorStore:
             self.build_from_documents(load_all_documents(data_dir))
 
 
+def content_to_text(content) -> str:
+    """Flatten an LLM response's .content to plain text.
+
+    Thinking models (e.g. Gemini) return content as a list of blocks like
+    [{"type": "text", "text": "..."}, ...] rather than a plain string.
+    """
+    if isinstance(content, str):
+        return content
+    if isinstance(content, list):
+        parts = []
+        for block in content:
+            if isinstance(block, dict):
+                parts.append(block.get("text") or block.get("content") or "")
+            else:
+                parts.append(str(block))
+        return "".join(parts).strip()
+    return str(content)
+
+
 class RAGSearch:
     """Retrieves relevant transcript chunks and summarizes them with an open-source LLM."""
 
@@ -179,4 +198,4 @@ class RAGSearch:
             "You are a tutoring analytics assistant. Using only the transcript excerpts below, "
             f"answer the question concisely and concretely.\n\nExcerpts:\n{context}\n\nQuestion: {query}"
         )
-        return self.llm.invoke(prompt).content
+        return content_to_text(self.llm.invoke(prompt).content)
