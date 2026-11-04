@@ -1,5 +1,7 @@
 # 🧑‍🏫 Teacher Intelligence Agent
 
+### 🚀 Live demo: **https://teacher-intelligence-agent.streamlit.app/**
+
 A Retrieval-Augmented Generation (RAG) system that reads student–tutor transcripts and
 turns them into structured, actionable insights — understanding level, misconceptions,
 sentiment, suggested next steps — with an optional one-click PDF report for educators.
