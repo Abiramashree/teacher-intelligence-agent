@@ -29,9 +29,13 @@ their OpenAI-compatible router). Embeddings run locally inside the app.
    LLM_PROVIDER = "openai"
    OPENAI_BASE_URL = "https://router.huggingface.co/v1"
    OPENAI_API_KEY = "hf_your_token_here"
-   SUMMARY_MODEL = "meta-llama/Llama-3.1-8B-Instruct"
-   AGENT_MODEL = "meta-llama/Llama-3.1-8B-Instruct"
+   SUMMARY_MODEL = "Qwen/Qwen2.5-7B-Instruct"
+   AGENT_MODEL = "Qwen/Qwen2.5-7B-Instruct"
    ```
+
+   (`Qwen/Qwen2.5-7B-Instruct` is open and ungated — no license step. You can swap in
+   another instruct model the router supports, e.g. `meta-llama/Llama-3.1-8B-Instruct`
+   after accepting its terms on the HF model page.)
 
 5. Deploy. First build takes a few minutes (installing deps, downloading the local
    embedding model, building the FAISS index). After that the app is live at a public
