@@ -74,7 +74,7 @@ with st.sidebar:
 
 query = st.text_area(
     "Ask about a student's session",
-    placeholder="e.g. Did the student understand the three states of matter? What should the tutor do next?",
+    placeholder="e.g. Did willy understand the three states of matter? What should the tutor do next?",
     height=90,
 )
 
