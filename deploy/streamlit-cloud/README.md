@@ -47,8 +47,8 @@ but it is **not an open-source model**. Use it instead of the OpenRouter block a
 ```toml
 LLM_PROVIDER = "gemini"
 GOOGLE_API_KEY = "AIza_your_key"
-SUMMARY_MODEL = "gemini-2.5-flash"
-AGENT_MODEL = "gemini-2.5-flash"
+SUMMARY_MODEL = "gemini-3.5-flash-lite"
+AGENT_MODEL = "gemini-3.5-flash-lite"
 ```
 
 Get a key at <https://aistudio.google.com/apikey>. This uses the native `langchain-
