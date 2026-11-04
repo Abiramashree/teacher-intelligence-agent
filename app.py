@@ -12,6 +12,15 @@ import os
 
 import streamlit as st
 
+# On Streamlit Community Cloud, configuration is provided via st.secrets rather than
+# real environment variables. Bridge them into os.environ BEFORE importing config,
+# which reads its settings from the environment at import time.
+try:
+    for _k, _v in st.secrets.items():
+        os.environ.setdefault(_k, str(_v))
+except Exception:
+    pass
+
 import config
 
 st.set_page_config(page_title="Teacher Intelligence Agent", page_icon="🧑‍🏫", layout="centered")
@@ -20,7 +29,12 @@ st.set_page_config(page_title="Teacher Intelligence Agent", page_icon="🧑‍�
 def backend_ready() -> tuple[bool, str]:
     """Best-effort check that the configured LLM backend is reachable."""
     if config.LLM_PROVIDER != "ollama":
-        return True, f"Using OpenAI-compatible endpoint: {config.OPENAI_BASE_URL}"
+        key_set = bool(config.OPENAI_API_KEY and config.OPENAI_API_KEY != "not-needed")
+        return key_set, (
+            f"Using OpenAI-compatible endpoint: {config.OPENAI_BASE_URL}"
+            if key_set
+            else "LLM_PROVIDER=openai but no API key is set (OPENAI_API_KEY)."
+        )
     try:
         import urllib.request
 

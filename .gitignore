@@ -8,6 +8,7 @@ env/
 
 # Env / secrets
 .env
+.streamlit/secrets.toml
 
 # Build artifacts
 faiss_store/

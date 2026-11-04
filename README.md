@@ -96,32 +96,30 @@ docker compose exec ollama ollama pull llama3.1:8b   # one time
 # open http://localhost:8501
 ```
 
-### Hosted demo (Hugging Face Spaces, open-source, no key)
+### Hosted demo (free, always-available)
 
-A ready-to-deploy, always-available cloud demo that self-hosts the model (Ollama +
-`llama3.2:3b`) in a single container — no API key, nothing proprietary. Files live in
-[`deploy/hf-space/`](deploy/hf-space/).
+Deploy on **Streamlit Community Cloud** with the LLM running on **Hugging Face's
+serverless Inference Providers** (open-source models). Free, public URL, no backend to
+manage. Full steps: [`deploy/streamlit-cloud/`](deploy/streamlit-cloud/).
 
-**One-time setup:**
+Short version: push this repo to GitHub, go to <https://share.streamlit.io>, deploy
+`app.py` from the repo, and add these **Secrets**:
 
-1. Push this repo to GitHub first (the Space builds from it).
-2. Create a new Space: <https://huggingface.co/new-space> → **SDK: Docker** → **blank**.
-3. Add just two files to the Space repo, copied from `deploy/hf-space/`:
-   - `Dockerfile`
-   - `README.md` (its YAML header configures the Space)
-4. The Space builds and launches automatically. First boot takes a minute or two while
-   it pulls the model; after that, open the Space URL and use it.
-
-```bash
-# e.g. push the two Space files:
-git clone https://huggingface.co/spaces/<your-username>/teacher-intelligence-agent space
-cp deploy/hf-space/Dockerfile deploy/hf-space/README.md space/
-cd space && git add -A && git commit -m "Deploy Teacher Intelligence Agent" && git push
+```toml
+LLM_PROVIDER = "openai"
+OPENAI_BASE_URL = "https://router.huggingface.co/v1"
+OPENAI_API_KEY = "hf_your_token_here"
+SUMMARY_MODEL = "meta-llama/Llama-3.1-8B-Instruct"
+AGENT_MODEL = "meta-llama/Llama-3.1-8B-Instruct"
 ```
 
-> Free CPU Spaces are always available but **pause after ~48h idle** and cold-start on
-> the next visit. For zero cold starts / faster inference, upgrade the Space hardware.
-> For snappier CPU responses, set `AGENT_MODEL=llama3.2:1b` in the Space's variables.
+> Free HF serverless inference has a small monthly credit (enough for a light demo), and
+> the app sleeps when idle and wakes on the next visit.
+
+**Self-hosted alternative (Hugging Face Space, requires HF PRO).** A single-container
+Docker Space that runs Ollama + the model itself — no per-call limits, fully self-hosted —
+lives in [`deploy/hf-space/`](deploy/hf-space/). Note that Docker Spaces are **no longer
+free**: HF now requires a PRO subscription for backend (non-static) Spaces.
 
 ## Configuration
 
@@ -154,7 +152,8 @@ To run against a different open-source model, just pull it and set the env var:
 ├── requirements.txt
 ├── .env.example
 ├── Dockerfile / docker-compose.yml
-├── deploy/hf-space/    # Hugging Face Spaces deployment (Dockerfile + Space README)
+├── deploy/streamlit-cloud/  # Free hosted demo (Streamlit Cloud + HF serverless)
+├── deploy/hf-space/    # Self-hosted Docker Space (requires HF PRO)
 └── Makefile / run_demo.sh
 ```
 
