@@ -98,20 +98,21 @@ docker compose exec ollama ollama pull llama3.1:8b   # one time
 
 ### Hosted demo (free, always-available)
 
-Deploy on **Streamlit Community Cloud** with the LLM running on **Groq's free API**
-(open-source Llama models). Free, public URL, no backend to manage. Full steps:
+Deploy on **Streamlit Community Cloud** with the LLM running on **OpenRouter's free
+tier** (open-weight models). Free, public URL, no backend to manage. Full steps:
 [`deploy/streamlit-cloud/`](deploy/streamlit-cloud/).
 
 Short version: push this repo to GitHub, get a free key at
-<https://console.groq.com/keys>, go to <https://share.streamlit.io>, deploy `app.py`
-from the repo, and add these **Secrets**:
+<https://openrouter.ai/keys> (and enable free models at
+<https://openrouter.ai/settings/privacy>), go to <https://share.streamlit.io>, deploy
+`app.py` from the repo, and add these **Secrets**:
 
 ```toml
 LLM_PROVIDER = "openai"
-OPENAI_BASE_URL = "https://api.groq.com/openai/v1"
-OPENAI_API_KEY = "gsk_your_groq_key_here"
-SUMMARY_MODEL = "llama-3.1-8b-instant"
-AGENT_MODEL = "llama-3.3-70b-versatile"
+OPENAI_BASE_URL = "https://openrouter.ai/api/v1"
+OPENAI_API_KEY = "sk-or-your_key_here"
+SUMMARY_MODEL = "google/gemma-4-26b-a4b-it:free"
+AGENT_MODEL = "google/gemma-4-26b-a4b-it:free"
 ```
 
 > The backend is OpenAI-compatible, so you can point `OPENAI_BASE_URL` at any provider

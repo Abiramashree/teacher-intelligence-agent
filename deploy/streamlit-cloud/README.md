@@ -1,50 +1,54 @@
-# Hosted demo — Streamlit Community Cloud + Groq (free, open-source models)
+# Hosted demo — Streamlit Community Cloud + OpenRouter (free, open-source models)
 
 Free, always-available, public URL. The app runs on Streamlit Community Cloud; the
-open-source LLM (Llama 3.x) runs on **Groq's free API** via its OpenAI-compatible
-endpoint. Embeddings run locally inside the app.
+open-weight LLM runs on **OpenRouter's free tier** via its OpenAI-compatible endpoint.
+Embeddings run locally inside the app.
 
-> Why Groq and not Hugging Face? HF's free serverless inference credit is tiny and runs
-> out fast (HTTP 402). Groq's free tier has no such micro-credit wall and serves
-> open-source Llama models with fast tool-calling. The code is backend-agnostic
-> (`LLM_PROVIDER=openai` + a base URL), so you can point it at any OpenAI-compatible
-> provider — HF router, a LiteLLM gateway, vLLM, etc. — by changing the secrets.
+> The code is backend-agnostic (`LLM_PROVIDER=openai` + a base URL), so you can point it
+> at any OpenAI-compatible provider — OpenRouter, Groq, Cerebras, a LiteLLM gateway,
+> vLLM, etc. — by changing the secrets, with no code change.
 
 ## One-time setup
 
 1. Make sure this repo is pushed to GitHub (it is):
    <https://github.com/Abiramashree/teacher-intelligence-agent>
 
-2. Get a free Groq API key at <https://console.groq.com/keys> (starts with `gsk_`).
+2. Create a free OpenRouter key at <https://openrouter.ai/keys> (starts with `sk-or-`).
 
-3. Go to <https://share.streamlit.io> → sign in with GitHub → **Create app** →
+3. **Enable free models:** at <https://openrouter.ai/settings/privacy>, turn on the
+   free-model / prompt-training data policy — otherwise `:free` models return 404.
+
+4. Go to <https://share.streamlit.io> → sign in with GitHub → **Create app** →
    **Deploy a public app from GitHub**:
    - Repository: `Abiramashree/teacher-intelligence-agent`
    - Branch: `main`
    - Main file path: `app.py`
 
-4. Open **Advanced settings → Secrets** (or **Settings → Secrets** on an existing app)
+5. Open **Advanced settings → Secrets** (or **Settings → Secrets** on an existing app)
    and paste:
 
    ```toml
    LLM_PROVIDER = "openai"
-   OPENAI_BASE_URL = "https://api.groq.com/openai/v1"
-   OPENAI_API_KEY = "gsk_your_groq_key_here"
-   SUMMARY_MODEL = "llama-3.1-8b-instant"
-   AGENT_MODEL = "llama-3.3-70b-versatile"
+   OPENAI_BASE_URL = "https://openrouter.ai/api/v1"
+   OPENAI_API_KEY = "sk-or-your_key_here"
+   SUMMARY_MODEL = "google/gemma-4-26b-a4b-it:free"
+   AGENT_MODEL = "google/gemma-4-26b-a4b-it:free"
    ```
 
-5. Deploy. First build takes a few minutes (installing deps, downloading the local
+6. Deploy. First build takes a few minutes (installing deps, downloading the local
    embedding model, building the FAISS index). After that the app is live at a public
    `*.streamlit.app` URL.
 
 ## Notes
 
-- **Groq free tier** has generous rate limits (requests/min, tokens/day) — fine for a
-  demo. The "Quick RAG summary" button uses the small 8B model; the full agent + PDF
-  button uses the 70B model for reliable tool calling.
-- Streamlit Community Cloud apps sleep after inactivity and wake on the next visit (a
-  short cold start).
+- **OpenRouter free tier** is roughly ~50 requests/day until you add a one-time $10
+  (then ~1000/day). Free model IDs rotate over time; list current ones that support tool
+  calling with:
+  ```bash
+  curl -s https://openrouter.ai/api/v1/models | python3 -c "import sys,json;[print(m['id']) for m in json.load(sys.stdin)['data'] if m['id'].endswith(':free') and 'tools' in (m.get('supported_parameters') or [])]"
+  ```
+- The "Quick RAG summary" button is a single call; the "full agent + PDF" button needs a
+  model that supports tool calling (the one above does). If a free model stops supporting
+  tools, switch `AGENT_MODEL` to `openrouter/free` (auto-selects a capable free model).
+- Streamlit Community Cloud apps sleep after inactivity and wake on the next visit.
 - Keep your key in Streamlit **Secrets**, never in the repo.
-- To use a different OpenAI-compatible provider instead, just change `OPENAI_BASE_URL`,
-  `OPENAI_API_KEY`, and the model names in the secrets — no code change.
