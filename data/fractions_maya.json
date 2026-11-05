@@ -1,0 +1,82 @@
+[
+    {
+        "role": "maya",
+        "text": "Hi, I have to add 1/4 and 2/3 and I don't get it.\n",
+        "timestamp": "2025-06-04T15:10:02.100Z"
+    },
+    {
+        "role": "assistant",
+        "text": "Hi Maya! Great problem to practice. Before we add them, what do you notice about the bottom numbers — the denominators — of 1/4 and 2/3?",
+        "timestamp": "2025-06-04T15:10:04.980Z"
+    },
+    {
+        "role": "maya",
+        "text": "One is 4 and one is 3. So the answer is 3/7? I just added the tops and bottoms.\n",
+        "timestamp": "2025-06-04T15:10:20.540Z"
+    },
+    {
+        "role": "assistant",
+        "text": "That's a really common idea, but adding the tops and bottoms separately changes the size of the pieces. The denominators have to match first. Think of it like adding quarters of a pizza to thirds of a pizza — the slices are different sizes. What number do both 4 and 3 divide into evenly?",
+        "timestamp": "2025-06-04T15:10:23.210Z"
+    },
+    {
+        "role": "maya",
+        "text": "Um... 12?\n",
+        "timestamp": "2025-06-04T15:10:38.770Z"
+    },
+    {
+        "role": "assistant",
+        "text": "Exactly, 12! So we rewrite both fractions with 12 on the bottom. 1/4 is how many twelfths? (Hint: 4 times what is 12?)",
+        "timestamp": "2025-06-04T15:10:40.333Z"
+    },
+    {
+        "role": "maya",
+        "text": "4 times 3 is 12, so 1/4 is 3/12. And 2/3 is... 3 times 4 is 12, so 8/12.\n",
+        "timestamp": "2025-06-04T15:11:05.900Z"
+    },
+    {
+        "role": "assistant",
+        "text": "Perfect — you multiplied the top by the same number as the bottom, which keeps the value the same. Now the slices match. What is 3/12 + 8/12?",
+        "timestamp": "2025-06-04T15:11:08.120Z"
+    },
+    {
+        "role": "maya",
+        "text": "11/12! Do I add the bottoms this time too?\n",
+        "timestamp": "2025-06-04T15:11:22.450Z"
+    },
+    {
+        "role": "assistant",
+        "text": "You've got 11/12 right! And good question — no. Once the denominators match, they stay the same; we only add the numerators, because we're just counting how many equal pieces we have. So 3 twelfths plus 8 twelfths is 11 twelfths.",
+        "timestamp": "2025-06-04T15:11:24.980Z"
+    },
+    {
+        "role": "maya",
+        "text": "Oh that makes sense now. Can I try 1/2 + 1/6 by myself?\n",
+        "timestamp": "2025-06-04T15:11:40.010Z"
+    },
+    {
+        "role": "assistant",
+        "text": "Yes, go for it — I'd love to see your steps!",
+        "timestamp": "2025-06-04T15:11:41.600Z"
+    },
+    {
+        "role": "maya",
+        "text": "Common bottom is 6. 1/2 is 3/6. 3/6 + 1/6 = 4/6. That's the answer.\n",
+        "timestamp": "2025-06-04T15:12:05.330Z"
+    },
+    {
+        "role": "assistant",
+        "text": "Beautiful work, and your method is spot on! One last challenge: 4/6 can be simplified. Do 4 and 6 share a common factor you could divide out?",
+        "timestamp": "2025-06-04T15:12:07.880Z"
+    },
+    {
+        "role": "maya",
+        "text": "They both divide by 2, so 2/3. Thanks, this is way less scary now.\n",
+        "timestamp": "2025-06-04T15:12:25.700Z"
+    },
+    {
+        "role": "assistant",
+        "text": "2/3 — exactly right, and well spotted. You went from adding tops and bottoms to finding common denominators and simplifying in one session. That's real progress, Maya!",
+        "timestamp": "2025-06-04T15:12:28.140Z"
+    }
+]

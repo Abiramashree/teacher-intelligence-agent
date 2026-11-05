@@ -2,11 +2,10 @@
 app.py
 Streamlit UI for the Teacher Intelligence Agent.
 
-Pick a question about a student's tutoring session and get back either a quick
+Pick (or type) a question about a student's tutoring session and get back either a quick
 RAG summary or a full set of structured insights (+ an optional PDF report).
 
-The backend runs entirely on open-source models (Ollama by default), so the demo
-needs no API key. Run:  streamlit run app.py
+The backend runs on open-source models (Ollama) or Gemini. Run:  streamlit run app.py
 """
 import os
 
@@ -43,6 +42,43 @@ except Exception:  # noqa: BLE001
 
 st.set_page_config(page_title="Teacher Intelligence Agent", page_icon="🧑‍🏫", layout="centered")
 
+# ----------------------------------------------------------------- styling
+st.markdown(
+    """
+    <style>
+      html, body, [class*="css"] { font-family: -apple-system, BlinkMacSystemFont,
+        "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+      .block-container { padding-top: 2rem; max-width: 820px; }
+      h1, h2, h3 { font-weight: 600; letter-spacing: -0.01em; }
+
+      .hero { background: linear-gradient(135deg, #eef1f6 0%, #f5f3fb 55%, #ffffff 100%);
+        border: 1px solid #e4e6ee; border-radius: 20px; padding: 28px 32px; margin: 0 0 1.3rem; }
+      .hero-eyebrow { font-size: 0.74rem; font-weight: 700; letter-spacing: 0.09em;
+        text-transform: uppercase; color: #6a5acd; }
+      .hero-title { font-size: 1.95rem; font-weight: 600; letter-spacing: -0.02em;
+        color: #1d1d1f; margin: 8px 0 10px; }
+      .hero-sub { font-size: 0.98rem; color: #3a3a3c; line-height: 1.55; max-width: 680px; }
+      .hero-meta { margin-top: 15px; display: flex; flex-wrap: wrap; gap: 8px; }
+      .hero-meta span { background: rgba(255,255,255,0.8); border: 1px solid #dfe1ea;
+        color: #3a3a3c; border-radius: 999px; padding: 4px 12px; font-size: 0.78rem; font-weight: 500; }
+
+      [data-testid="stVerticalBlockBorderWrapper"] { border-radius: 16px;
+        box-shadow: 0 1px 2px rgba(16,24,40,0.04); background: #ffffff; }
+
+      .sect { font-size: 0.76rem; font-weight: 700; letter-spacing: 0.05em;
+        text-transform: uppercase; color: #86868b; margin: 0.1rem 0 0.5rem; }
+      .hint { font-size: 0.85rem; color: #6e6e73; margin: 0 0 0.4rem; }
+      .answer { background: #f6f7f9; border: 1px solid #edeff2; border-radius: 12px;
+        padding: 16px 20px; color: #1d1d1f; line-height: 1.6; }
+      /* example chips: compact, left-aligned secondary buttons */
+      div[data-testid="column"] button[kind="secondary"] { text-align: left;
+        font-size: 0.85rem; font-weight: 450; white-space: normal; line-height: 1.3;
+        color: #35507a; border-color: #e0e4ee; background: #f7f9fc; }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
 
 def backend_ready() -> tuple[bool, str]:
     """Best-effort check that the configured LLM backend is reachable."""
@@ -72,8 +108,26 @@ def backend_ready() -> tuple[bool, str]:
         )
 
 
-st.title("🧑‍🏫 Teacher Intelligence Agent")
-st.caption("RAG + a tool-using agent that turns tutoring transcripts into actionable student insights — on open-source models.")
+# ----------------------------------------------------------------- hero
+st.markdown(
+    """
+    <div class="hero">
+      <div class="hero-eyebrow">RAG · Tool-using Agent</div>
+      <div class="hero-title">🧑‍🏫 Teacher Intelligence Agent</div>
+      <div class="hero-sub">Turns raw tutoring transcripts into actionable insight about a
+        learner — what they understood, where they got stuck, and what the tutor should do
+        next — using retrieval-augmented generation and a tool-using agent. Runs on
+        open-source models or Gemini.</div>
+      <div class="hero-meta">
+        <span>Semantic retrieval (FAISS)</span>
+        <span>LangChain agent</span>
+        <span>Structured insights</span>
+        <span>PDF report</span>
+      </div>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
 
 ready, backend_msg = backend_ready()
 
@@ -89,16 +143,46 @@ with st.sidebar:
     st.subheader("Backend")
     (st.success if ready else st.error)(backend_msg)
     st.caption(f"Provider: `{config.LLM_PROVIDER}` · summary: `{config.SUMMARY_MODEL}` · agent: `{config.AGENT_MODEL}`")
+    st.divider()
+    st.subheader("Students in the demo data")
+    st.caption("Willy (math, science) · Maya (fractions) · Diego (multiplication) · "
+               "Aisha (reading) · Sam (geometry) · Nia (photosynthesis)")
 
-query = st.text_area(
-    "Ask about a student's session",
-    placeholder="e.g. Did willy understand the three states of matter? What should the tutor do next?",
-    height=90,
-)
+# Example prompts — clicking one fills the box.
+EXAMPLES = [
+    "Did Willy understand the three states of matter, and what should the tutor do next?",
+    "Where did Maya get stuck adding fractions — and did she recover by the end?",
+    "Summarize Diego's multiplication session: what frustrated him and how did he respond?",
+    "How engaged and confident was Aisha in the reading-comprehension session?",
+    "Did Sam confuse area and perimeter? Give concrete next steps for the tutor.",
+    "What misconceptions came up across students this week, and which need follow-up?",
+]
 
-col1, col2 = st.columns(2)
-run_search = col1.button("🔍 Quick RAG summary", use_container_width=True)
-run_agent = col2.button("🧠 Full structured insights + PDF", use_container_width=True)
+if "query" not in st.session_state:
+    st.session_state["query"] = EXAMPLES[0]
+
+with st.container(border=True):
+    st.markdown("<div class='sect'>Ask about a student's session</div>", unsafe_allow_html=True)
+    st.markdown("<div class='hint'>Pick an example to get started, or write your own:</div>",
+                unsafe_allow_html=True)
+    ex_cols = st.columns(2)
+    for i, ex in enumerate(EXAMPLES):
+        if ex_cols[i % 2].button(ex, key=f"ex{i}", use_container_width=True):
+            st.session_state["query"] = ex
+
+    query = st.text_area(
+        "Your question",
+        key="query",
+        placeholder=("e.g. Did Willy understand the three states of matter? What should the "
+                     "tutor do next? · Where did Maya get stuck on fractions? · "
+                     "Summarize Diego's session and list his misconceptions."),
+        height=90,
+        label_visibility="collapsed",
+    )
+
+    col1, col2 = st.columns(2)
+    run_search = col1.button("🔍 Quick RAG summary", use_container_width=True, type="primary")
+    run_agent = col2.button("🧠 Full structured insights + PDF", use_container_width=True)
 
 if (run_search or run_agent) and not ready:
     st.error(backend_msg)
@@ -109,10 +193,12 @@ elif run_search:
         from rag_engine import RAGSearch
 
         rag = RAGSearch()
-        st.markdown("### Summary")
-        # Coerce to text at the app level too, so a stale rag_engine (returning raw .content)
-        # still renders as prose rather than a JSON tree.
-        st.markdown(content_to_text(rag.search_and_summarize(query)))
+        with st.container(border=True):
+            st.markdown("<div class='sect'>Summary</div>", unsafe_allow_html=True)
+            # Coerce to text at the app level too, so a stale rag_engine (returning raw .content)
+            # still renders as prose rather than a JSON tree.
+            st.markdown(f"<div class='answer'>{content_to_text(rag.search_and_summarize(query))}</div>",
+                        unsafe_allow_html=True)
 
 elif run_agent:
     with st.spinner("Running the tutoring-insights agent (retrieval → reasoning → structured output)..."):
@@ -122,16 +208,17 @@ elif run_agent:
         full_query = query + " Also save the insights as a PDF named 'tutoring_insights.pdf'."
         result = executor.invoke({"input": full_query})
 
-        st.markdown("### Agent Output")
-        st.markdown(content_to_text(result.get("output", "")))
+        with st.container(border=True):
+            st.markdown("<div class='sect'>Agent output</div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='answer'>{content_to_text(result.get('output', ''))}</div>",
+                        unsafe_allow_html=True)
 
-        pdf_path = "tutoring_insights.pdf"
-        if os.path.exists(pdf_path):
-            with open(pdf_path, "rb") as fh:
-                st.download_button("⬇️ Download PDF report", fh, file_name="tutoring_insights.pdf")
+            pdf_path = "tutoring_insights.pdf"
+            if os.path.exists(pdf_path):
+                with open(pdf_path, "rb") as fh:
+                    st.download_button("⬇️ Download PDF report", fh, file_name="tutoring_insights.pdf")
 
-st.divider()
 st.caption(
-    "Demo data: anonymized sample math/science tutoring transcripts in `data/`. "
+    "Demo data: sample math / science / reading tutoring transcripts in `data/`. "
     "Swap in your own JSON transcripts (role/text/timestamp turns) to try it on real sessions."
 )

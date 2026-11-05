@@ -1,0 +1,72 @@
+[
+    {
+        "role": "diego",
+        "text": "I hate times tables. I keep getting 7 times 8 wrong.\n",
+        "timestamp": "2025-06-05T10:20:01.500Z"
+    },
+    {
+        "role": "assistant",
+        "text": "I hear you, Diego — 7 times 8 trips a lot of people up. Let's make it easier instead of memorizing it cold. Do you already know 7 times 4?",
+        "timestamp": "2025-06-05T10:20:03.900Z"
+    },
+    {
+        "role": "diego",
+        "text": "28.\n",
+        "timestamp": "2025-06-05T10:20:12.300Z"
+    },
+    {
+        "role": "assistant",
+        "text": "Nice. 7 times 8 is just double 7 times 4, because 8 is two 4s. So what's 28 doubled?",
+        "timestamp": "2025-06-05T10:20:14.600Z"
+    },
+    {
+        "role": "diego",
+        "text": "56. Wait is that it? That felt too easy.\n",
+        "timestamp": "2025-06-05T10:20:30.880Z"
+    },
+    {
+        "role": "assistant",
+        "text": "That's it — 56! Easy is good. Breaking a hard fact into ones you already know is exactly what strong math students do. Want a trick to double-check it a different way?",
+        "timestamp": "2025-06-05T10:20:33.100Z"
+    },
+    {
+        "role": "diego",
+        "text": "Sure I guess.\n",
+        "timestamp": "2025-06-05T10:20:44.200Z"
+    },
+    {
+        "role": "assistant",
+        "text": "7 times 8 and 8 times 7 are the same — order doesn't change the answer. So you only ever have to learn each fact once. Try 6 times 9 for me, and break it up however feels easy.",
+        "timestamp": "2025-06-05T10:20:46.700Z"
+    },
+    {
+        "role": "diego",
+        "text": "6 times 9... I don't know that one either. This is why I give up.\n",
+        "timestamp": "2025-06-05T10:21:04.410Z"
+    },
+    {
+        "role": "assistant",
+        "text": "Hey, don't give up — you just nailed a harder one. Let's use the same idea: 6 times 9 is 6 times 10 minus 6. What's 6 times 10?",
+        "timestamp": "2025-06-05T10:21:06.980Z"
+    },
+    {
+        "role": "diego",
+        "text": "60. Minus 6 is 54.\n",
+        "timestamp": "2025-06-05T10:21:20.650Z"
+    },
+    {
+        "role": "assistant",
+        "text": "54 — yes! See, you're not bad at this at all; you just needed a strategy instead of raw memorizing. How are you feeling now?",
+        "timestamp": "2025-06-05T10:21:23.300Z"
+    },
+    {
+        "role": "diego",
+        "text": "Better. Can we do a couple more so I remember the trick?\n",
+        "timestamp": "2025-06-05T10:21:36.900Z"
+    },
+    {
+        "role": "assistant",
+        "text": "Absolutely — that's a great instinct. Let's do 8 times 9 and 7 times 6 next, using the same break-it-down moves.",
+        "timestamp": "2025-06-05T10:21:38.720Z"
+    }
+]

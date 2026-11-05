@@ -1,0 +1,62 @@
+[
+    {
+        "role": "aisha",
+        "text": "I read the passage about the honeybees. Ask me anything!\n",
+        "timestamp": "2025-06-06T11:05:00.200Z"
+    },
+    {
+        "role": "assistant",
+        "text": "Love the confidence, Aisha! Let's start big-picture: in one sentence, what was the main idea of the passage?",
+        "timestamp": "2025-06-06T11:05:02.400Z"
+    },
+    {
+        "role": "aisha",
+        "text": "It's about how honeybees talk to each other by dancing to show where flowers are.\n",
+        "timestamp": "2025-06-06T11:05:18.900Z"
+    },
+    {
+        "role": "assistant",
+        "text": "Excellent — that's the main idea, stated clearly. Now a detail question: the passage mentioned the 'waggle dance.' What does the waggle tell the other bees?",
+        "timestamp": "2025-06-06T11:05:21.100Z"
+    },
+    {
+        "role": "aisha",
+        "text": "The direction and how far the flowers are, I think. The angle shows direction.\n",
+        "timestamp": "2025-06-06T11:05:39.550Z"
+    },
+    {
+        "role": "assistant",
+        "text": "Exactly right, both parts. You're pulling specific evidence from the text, which is a strong comprehension skill. Let's go a level deeper — this is an inference question: why might dancing be more useful to bees than just flying out and leading the others there?",
+        "timestamp": "2025-06-06T11:05:42.000Z"
+    },
+    {
+        "role": "aisha",
+        "text": "Because one bee can tell lots of bees at once without flying back and forth? So it saves time and energy.\n",
+        "timestamp": "2025-06-06T11:06:05.700Z"
+    },
+    {
+        "role": "assistant",
+        "text": "That's a thoughtful inference — the passage doesn't say it directly, and you reasoned it from the facts. One vocabulary check: the passage used the word 'forage.' What do you think it means here?",
+        "timestamp": "2025-06-06T11:06:08.260Z"
+    },
+    {
+        "role": "aisha",
+        "text": "Like searching for food? To forage is to go look for food.\n",
+        "timestamp": "2025-06-06T11:06:22.900Z"
+    },
+    {
+        "role": "assistant",
+        "text": "Spot on. You handled main idea, details, an inference, and vocabulary all in one go. If I wanted to stretch you next time, I'd give you two passages to compare. Would you be up for that?",
+        "timestamp": "2025-06-06T11:06:25.400Z"
+    },
+    {
+        "role": "aisha",
+        "text": "Yes! Comparing sounds fun. Can the next one be about sharks?\n",
+        "timestamp": "2025-06-06T11:06:38.100Z"
+    },
+    {
+        "role": "assistant",
+        "text": "Sharks it is — I'll bring two short shark passages so we can compare what each author focuses on. Great session, Aisha; your comprehension is really solid.",
+        "timestamp": "2025-06-06T11:06:40.900Z"
+    }
+]
