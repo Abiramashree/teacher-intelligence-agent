@@ -110,7 +110,9 @@ elif run_search:
 
         rag = RAGSearch()
         st.markdown("### Summary")
-        st.write(rag.search_and_summarize(query))
+        # Coerce to text at the app level too, so a stale rag_engine (returning raw .content)
+        # still renders as prose rather than a JSON tree.
+        st.markdown(content_to_text(rag.search_and_summarize(query)))
 
 elif run_agent:
     with st.spinner("Running the tutoring-insights agent (retrieval → reasoning → structured output)..."):
