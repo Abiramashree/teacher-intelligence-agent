@@ -23,6 +23,24 @@ except Exception:
 
 import config
 
+# Flatten an LLM response's content to plain text. Import the canonical helper, but keep a
+# built-in fallback so the agent/PDF path never crashes if the deployed module is out of date.
+try:
+    from rag_engine import content_to_text
+except Exception:  # noqa: BLE001
+    def content_to_text(content) -> str:
+        if isinstance(content, str):
+            return content
+        if isinstance(content, list):
+            parts = []
+            for block in content:
+                if isinstance(block, dict):
+                    parts.append(block.get("text") or block.get("content") or "")
+                else:
+                    parts.append(str(block))
+            return "".join(parts).strip()
+        return str(content)
+
 st.set_page_config(page_title="Teacher Intelligence Agent", page_icon="🧑‍🏫", layout="centered")
 
 
@@ -101,7 +119,6 @@ elif run_agent:
         executor = build_agent_executor()
         full_query = query + " Also save the insights as a PDF named 'tutoring_insights.pdf'."
         result = executor.invoke({"input": full_query})
-        from rag_engine import content_to_text
 
         st.markdown("### Agent Output")
         st.markdown(content_to_text(result.get("output", "")))
