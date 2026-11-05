@@ -7,7 +7,9 @@ RAG summary or a full set of structured insights (+ an optional PDF report).
 
 The backend runs on open-source models (Ollama) or Gemini. Run:  streamlit run app.py
 """
+import json
 import os
+import re
 
 import streamlit as st
 
@@ -40,6 +42,69 @@ except Exception:  # noqa: BLE001
             return "".join(parts).strip()
         return str(content)
 
+
+def parse_insights(text: str):
+    """Pull the structured-insights JSON out of the agent's output, or None if absent."""
+    if not text:
+        return None
+    t = text.strip()
+    m = re.search(r"```(?:json)?\s*(.*?)```", t, re.S)  # strip a ```json fence if present
+    if m:
+        t = m.group(1).strip()
+    s, e = t.find("{"), t.rfind("}")
+    if s != -1 and e != -1 and e > s:
+        t = t[s:e + 1]
+    try:
+        d = json.loads(t)
+        return d if isinstance(d, dict) else None
+    except Exception:  # noqa: BLE001
+        return None
+
+
+def render_insights(d: dict) -> None:
+    """Render the structured TutoringInsights as a readable report."""
+    if d.get("summary"):
+        st.markdown(f"<div class='answer'>{d['summary']}</div>", unsafe_allow_html=True)
+        st.write("")
+
+    cols = st.columns(5)
+    cols[0].metric("Understanding", str(d.get("student_understanding", "—")).title())
+    cols[1].metric("Bloom's level", d.get("blooms_level", "—"))
+    cols[2].metric("Sentiment", str(d.get("sentiment", "—")).title())
+    dr = d.get("difficulty_rating")
+    cols[3].metric("Difficulty", f"{dr}/5" if isinstance(dr, (int, float)) else "—")
+    cf = d.get("confidence")
+    cols[4].metric("Confidence", f"{cf*100:.0f}%" if isinstance(cf, (int, float)) else "—")
+
+    topics = d.get("topics") or []
+    if topics:
+        st.markdown("<div class='sect'>Topics</div>"
+                    + "".join(f"<span class='badge'>{t}</span>" for t in topics),
+                    unsafe_allow_html=True)
+
+    def lst(title, items):
+        items = items or []
+        if items:
+            st.markdown(f"<div class='sect'>{title}</div>", unsafe_allow_html=True)
+            st.markdown("\n".join(f"- {i}" for i in items))
+
+    c1, c2 = st.columns(2)
+    with c1:
+        lst("Misconceptions", d.get("misconceptions"))
+        lst("Questions to ask", d.get("questions_to_ask"))
+        lst("Next best prompts", d.get("next_best_prompts"))
+    with c2:
+        lst("Knowledge gaps", d.get("knowledge_gaps"))
+        lst("Suggested activities", d.get("suggested_activities"))
+        lst("Actionable feedback", d.get("actionable_feedback"))
+
+    quotes = d.get("key_quotes") or []
+    if quotes:
+        st.markdown("<div class='sect'>Key quotes from the session</div>", unsafe_allow_html=True)
+        for q in quotes:
+            st.markdown(f"> *{q}*")
+
+
 st.set_page_config(page_title="Teacher Intelligence Agent", page_icon="🧑‍🏫", layout="centered")
 
 # ----------------------------------------------------------------- styling
@@ -70,6 +135,13 @@ st.markdown(
       .hint { font-size: 0.85rem; color: #6e6e73; margin: 0 0 0.4rem; }
       .answer { background: #f6f7f9; border: 1px solid #edeff2; border-radius: 12px;
         padding: 16px 20px; color: #1d1d1f; line-height: 1.6; }
+      [data-testid="stMetric"] { background: #f6f7f9; border: 1px solid #edeff2;
+        border-radius: 12px; padding: 12px 14px 8px; }
+      [data-testid="stMetricLabel"] p { font-size: 0.74rem; color: #6e6e73; font-weight: 500; }
+      [data-testid="stMetricValue"] { font-size: 1.15rem; font-weight: 600; letter-spacing: -0.01em; }
+      .badge { display:inline-block; background:#eef1f4; color:#35507a;
+        border-radius: 999px; padding: 3px 11px; font-size: 0.80rem; margin: 0 6px 6px 0; }
+      blockquote { border-left: 3px solid #cdd6e4; color: #4a4a4e; }
       /* example chips: compact, left-aligned secondary buttons */
       div[data-testid="column"] button[kind="secondary"] { text-align: left;
         font-size: 0.85rem; font-weight: 450; white-space: normal; line-height: 1.3;
@@ -208,10 +280,14 @@ elif run_agent:
         full_query = query + " Also save the insights as a PDF named 'tutoring_insights.pdf'."
         result = executor.invoke({"input": full_query})
 
+        out = content_to_text(result.get("output", ""))
+        data = parse_insights(out)
         with st.container(border=True):
-            st.markdown("<div class='sect'>Agent output</div>", unsafe_allow_html=True)
-            st.markdown(f"<div class='answer'>{content_to_text(result.get('output', ''))}</div>",
-                        unsafe_allow_html=True)
+            st.markdown("<div class='sect'>Structured insights</div>", unsafe_allow_html=True)
+            if data:
+                render_insights(data)
+            else:
+                st.markdown(f"<div class='answer'>{out}</div>", unsafe_allow_html=True)
 
             pdf_path = "tutoring_insights.pdf"
             if os.path.exists(pdf_path):
