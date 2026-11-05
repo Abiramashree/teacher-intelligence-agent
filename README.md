@@ -1,190 +1,87 @@
-# 🧑‍🏫 Teacher Intelligence Agent
+# Teacher Intelligence Agent
 
-### 🚀 Live demo: **https://teacher-intelligence-agent.streamlit.app/**
+**Live demo → https://teacher-intelligence-agent.streamlit.app/**
 
-A Retrieval-Augmented Generation (RAG) system that reads student–tutor transcripts and
-turns them into structured, actionable insights — understanding level, misconceptions,
-sentiment, suggested next steps — with an optional one-click PDF report for educators.
+A retrieval-augmented, tool-using agent that reads student–tutor transcripts and turns them
+into structured, actionable teaching insight — what the learner understood, where they got
+stuck, how they felt, and what the tutor should do next — with an optional one-click PDF
+report for educators.
 
-**Runs entirely on open-source models.** By default the LLM backend is [Ollama](https://ollama.com)
-serving a local model (Llama 3.1 8B), and embeddings use a local SentenceTransformers
-model — so the demo needs **no API key and no third-party service**.
+It is designed to be backend-agnostic: the same code runs on fully open-source models
+(Ollama, locally) or on Gemini / any OpenAI-compatible endpoint, so the demo can be hosted
+for free while a production deployment can swap in whatever model it prefers.
 
 ---
 
+## The problem it addresses
+
+Tutoring transcripts are rich but unstructured — a teacher would have to re-read an entire
+session to answer "did this student actually get it, and what should I do next time?" This
+project turns that raw conversation into a concise, evidence-grounded diagnosis a tutor can
+act on in seconds.
+
 ## What it does
 
-Given a folder of tutoring session transcripts, the agent answers questions like:
+Ask a natural-language question about a session — for example *"Where did Maya get stuck
+adding fractions, and did she recover?"* — and the agent returns either:
 
-> *"Did the student understand the three states of matter? What should the tutor do next?"*
+- a **quick summary** grounded in the most relevant transcript passages, or
+- a **full structured report**: topics covered, the student's understanding level,
+  misconceptions, knowledge gaps, suggested questions and activities, next-best prompts,
+  sentiment, Bloom's-taxonomy level, confidence, and supporting quotes — rendered as a clean
+  report and exportable to PDF.
 
-…and returns either a quick semantic-search summary, or a full structured report covering:
+The demo ships with transcripts for six learners across different subjects (fractions,
+multiplication, reading comprehension, geometry, states of matter, photosynthesis), each
+written with a realistic arc — a misconception, a struggle, and a recovery — so the agent has
+genuine signal to retrieve and reason over, including cross-student questions.
 
-- Topics covered & knowledge gaps
-- Misconceptions identified
-- Student sentiment & confidence
-- Bloom's taxonomy level
-- Suggested follow-up questions and activities
-- A downloadable PDF report
-
-## Architecture
+## How it works
 
 ```
 Transcripts (JSON)
       │
+      ▼  chunk  →  embed (SentenceTransformers, local)
       ▼
-Chunking (LangChain RecursiveCharacterTextSplitter)
+FAISS vector index
       │
-      ▼
-Embeddings (SentenceTransformers: all-MiniLM-L6-v2, local)
+      ├──►  Quick summary: semantic retrieval → LLM re-expresses the evidence
       │
-      ▼
-FAISS vector index  ──────────────┐
-      │                            │
-      ▼                            ▼
-RAGSearch (open-source LLM)   LangChain tool-calling agent (open-source LLM)
-  quick summaries                rag_search → structured Pydantic
-                                 insights → save_tutoring_insights_pdf
+      └──►  Agent: a tool-calling LangChain agent that decides when to call
+            rag_search (to ground itself in real transcript evidence) and
+            save_tutoring_insights_pdf (to export), returning a schema-validated report
 ```
 
-The agent is a real **tool-calling LangChain agent**, not a fixed pipeline: it decides
-when to call `rag_search` to ground itself in transcript evidence, and when to call
-`save_tutoring_insights_pdf` to export a report — both implemented as LangChain `@tool`s.
+The nuances that make it more than a prompt wrapper:
 
-## Tech stack
+- **It's a genuine tool-calling agent, not a fixed pipeline.** The agent chooses when to
+  retrieve evidence and when to export, rather than following hard-coded steps — the
+  retrieval and PDF export are both real tools it can call.
+- **Answers are grounded in evidence.** Insights are built from passages actually retrieved
+  from the transcripts, not from the model's general knowledge, and the report surfaces the
+  supporting quotes.
+- **Output is schema-validated.** The structured report is defined by a Pydantic schema, so
+  the result is a predictable object (consistent fields, constrained value ranges) that the UI
+  and the PDF exporter can both rely on — and the UI renders it as a report rather than a raw
+  blob, falling back to plain text if a response can't be parsed.
+- **The backend is swappable by configuration alone.** Embeddings run locally; the LLM is
+  chosen at runtime (open-source via Ollama, or Gemini / any OpenAI-compatible server) with no
+  code changes — which is what lets the hosted demo stay free while keeping a production path open.
 
-| Layer | Tool |
-|---|---|
-| Embeddings | SentenceTransformers (`all-MiniLM-L6-v2`), local |
-| Vector store | FAISS |
-| LLM backend | **Ollama** (open-source models, local) — or any OpenAI-compatible server |
-| Orchestration | LangChain (tools, agents, prompt templates) |
-| Structured output | Pydantic |
-| Report | ReportLab (PDF) |
-| UI | Streamlit |
+## What it demonstrates
 
-## Quick start (local, open-source)
+Practical RAG and agent engineering: local embeddings and a FAISS vector store, a tool-calling
+LangChain agent with evidence-grounded retrieval, schema-validated structured output, a
+report/PDF presentation layer, and a provider-agnostic LLM backend — assembled around a
+concrete, human problem rather than a toy demo.
 
-**Prerequisites:** Python 3.10+, and [Ollama](https://ollama.com/download).
+## Built with
 
-```bash
-# 1. install Python deps
-pip install -r requirements.txt
+Python · LangChain (tools & agents) · FAISS · SentenceTransformers · Pydantic · ReportLab ·
+Streamlit · Ollama / Gemini / OpenAI-compatible backends.
 
-# 2. pull an open-source model (8B fits comfortably in ~16GB)
-ollama pull llama3.1:8b
-
-# 3. build the vector index and launch the demo
-python scripts/build_index.py
-streamlit run app.py
-```
-
-Or do all of it with one command:
-
-```bash
-./run_demo.sh        # installs deps, starts Ollama, pulls the model, builds the index, launches the UI
-# or
-make demo
-```
-
-Open http://localhost:8501, type a question, and click **Quick RAG summary** or
-**Full structured insights + PDF**.
-
-### Run it fully containerized
-
-```bash
-docker compose up --build
-docker compose exec ollama ollama pull llama3.1:8b   # one time
-# open http://localhost:8501
-```
-
-### Hosted demo (free, always-available)
-
-Deploy on **Streamlit Community Cloud** with the LLM running on **OpenRouter's free
-tier** (open-weight models). Free, public URL, no backend to manage. Full steps:
-[`deploy/streamlit-cloud/`](deploy/streamlit-cloud/).
-
-Short version: push this repo to GitHub, get a free key at
-<https://openrouter.ai/keys> (and enable free models at
-<https://openrouter.ai/settings/privacy>), go to <https://share.streamlit.io>, deploy
-`app.py` from the repo, and add these **Secrets**:
-
-```toml
-LLM_PROVIDER = "openai"
-OPENAI_BASE_URL = "https://openrouter.ai/api/v1"
-OPENAI_API_KEY = "sk-or-your_key_here"
-SUMMARY_MODEL = "google/gemma-4-26b-a4b-it:free"
-AGENT_MODEL = "google/gemma-4-26b-a4b-it:free"
-```
-
-> The backend is OpenAI-compatible, so you can point `OPENAI_BASE_URL` at any provider
-> (Groq, a LiteLLM gateway, vLLM, the HF router, …) without code changes. The app sleeps
-> when idle and wakes on the next visit.
-
-**Self-hosted alternative (Hugging Face Space, requires HF PRO).** A single-container
-Docker Space that runs Ollama + the model itself — no per-call limits, fully self-hosted —
-lives in [`deploy/hf-space/`](deploy/hf-space/). Note that Docker Spaces are **no longer
-free**: HF now requires a PRO subscription for backend (non-static) Spaces.
-
-## Configuration
-
-All settings are environment variables (see [`.env.example`](.env.example)); copy it to
-`.env` to override. Key ones:
-
-| Variable | Default | Purpose |
-|---|---|---|
-| `LLM_PROVIDER` | `ollama` | `ollama` (local) or `openai` (any OpenAI-compatible server) |
-| `OLLAMA_BASE_URL` | `http://localhost:11434` | Ollama endpoint |
-| `AGENT_MODEL` / `SUMMARY_MODEL` | `llama3.1:8b` | Open-source models to use |
-| `OPENAI_BASE_URL` | `http://localhost:4000/v1` | Used when `LLM_PROVIDER=openai` (e.g. a LiteLLM gateway / vLLM) |
-| `TOP_K`, `CHUNK_SIZE`, `CHUNK_OVERLAP` | `5`, `1000`, `200` | Retrieval tuning |
-
-To run against a different open-source model, just pull it and set the env var:
-`ollama pull qwen2.5:7b && AGENT_MODEL=qwen2.5:7b streamlit run app.py`.
-
-## Project structure
-
-```
-├── app.py              # Streamlit UI (entry point)
-├── config.py           # Env-driven configuration
-├── llm.py              # Open-source LLM factory (Ollama / OpenAI-compatible)
-├── rag_engine.py       # Chunking, embeddings, FAISS store, RAG summarization
-├── agent.py            # Insights schema, tools, agent executor
-├── report.py           # PDF report generation
-├── scripts/build_index.py  # Pre-build the FAISS index
-├── tests/              # Offline tests (no LLM/network needed)
-├── data/               # Sample anonymized tutoring transcripts (JSON)
-├── requirements.txt
-├── .env.example
-├── Dockerfile / docker-compose.yml
-├── deploy/streamlit-cloud/  # Free hosted demo (Streamlit Cloud + HF serverless)
-├── deploy/hf-space/    # Self-hosted Docker Space (requires HF PRO)
-└── Makefile / run_demo.sh
-```
-
-## Tests
-
-```bash
-make test        # or: pytest -q
-```
-
-The tests cover document loading, the FAISS build/search round-trip, and PDF
-generation — none of them require a running model.
-
-## Use cases
-
-- **EdTech platforms** — personalized learning analytics at scale
-- **Tutors & teachers** — automatic progress tracking across sessions
-- **Learning-analytics research** — engagement & comprehension trend analysis
-- **Student-support teams** — early identification of confusion or disengagement
-
-## Notes
-
-- Sample data in `data/` is small, anonymized, and included only to demo the pipeline —
-  swap in your own transcripts (same `role`/`text`/`timestamp` JSON shape) to try it on
-  real sessions.
-- The FAISS index is rebuilt automatically the first time you run the app if `faiss_store/`
-  doesn't already exist (`scripts/build_index.py` just does it ahead of time).
+The sample transcripts are small and synthetic, included only to demonstrate the pipeline;
+the same JSON shape (`role` / `text` / `timestamp` turns) works for real sessions.
 
 ## License
 
